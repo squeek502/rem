@@ -73,6 +73,34 @@ pub fn build(b: *std.Build) void {
     }
 
     {
+        const microbench = b.addExecutable(.{
+            .name = "microbench",
+            .root_source_file = b.path("test/microbench.zig"),
+            .target = target,
+            .optimize = optimize,
+        });
+        microbench.root_module.addImport("rem", rem_module);
+
+        const install = b.addInstallArtifact(microbench, .{});
+        const step = b.step("microbench", "Build and install microbench");
+        step.dependOn(&install.step);
+    }
+
+    {
+        const bench = b.addExecutable(.{
+            .name = "bench",
+            .root_source_file = b.path("test/bench.zig"),
+            .target = target,
+            .optimize = optimize,
+        });
+        bench.root_module.addImport("rem", rem_module);
+
+        const install = b.addInstallArtifact(bench, .{});
+        const step = b.step("bench", "Build and install bench");
+        step.dependOn(&install.step);
+    }
+
+    {
         const example = b.addExecutable(.{
             .name = "example",
             .root_source_file = b.path("./example.zig"),
